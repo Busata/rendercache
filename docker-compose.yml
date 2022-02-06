@@ -14,7 +14,7 @@ services:
     container_name: rendercache
     restart: always
     ports:
-      - "5001:8080"
+      - "8080:8080"
     volumes:
       - rendercache:/storage
 
