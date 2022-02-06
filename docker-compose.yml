@@ -1,0 +1,25 @@
+version: '3.5'
+services:
+  rendercache-web:
+    build: ./nginx
+    container_name: rendercache-proxy
+    restart: always
+    depends_on:
+      - rendercache
+    environment:
+      - VIRTUAL_HOST=rendercache.veevi.org
+      - LETSENCRYPT_HOST=rendercache.veevi.org
+  rendercache:
+    build: .
+    container_name: rendercache
+    restart: always
+    ports:
+      - "5001:8080"
+    volumes:
+      - rendercache:/storage
+
+volumes:
+  rendercache:
+networks:
+  default:
+    name: veevi
