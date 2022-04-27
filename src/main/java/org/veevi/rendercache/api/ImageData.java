@@ -6,7 +6,8 @@ import java.awt.image.BufferedImage;
 
 public record ImageData(
         MediaType format,
-        BufferedImage image
+        BufferedImage image,
+        int rotation
 ){
 
     public float ratio() {
@@ -14,6 +15,6 @@ public record ImageData(
     }
 
     public ImageData updateImage(BufferedImage updatedImage) {
-        return new ImageData(format, updatedImage);
+        return new ImageData(format, updatedImage, rotation);
     }
 }

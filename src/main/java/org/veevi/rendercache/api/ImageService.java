@@ -1,5 +1,10 @@
 package org.veevi.rendercache.api;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
@@ -24,8 +29,8 @@ public class ImageService {
             final var data = loadImage(imageUrl);
 
             final var preferredHeight = (int) Math.ceil(width * data.ratio());
-            return data.updateImage(scaleImage(data.image(), preferredHeight, width));
-        } catch (IOException e) {
+            return data.updateImage(scaleImage(data.image(), preferredHeight, width, data.rotation()));
+        } catch (Exception e) {
             log.error("Could not scale image {} to width {}", imageUrl, width, e);
         }
         return null;
@@ -38,31 +43,39 @@ public class ImageService {
 
             final var preferredWidth = (int) Math.ceil(height * data.ratio());
 
-            return data.updateImage(scaleImage(data.image(), height, preferredWidth));
-        } catch (IOException e) {
+            return data.updateImage(scaleImage(data.image(), height, preferredWidth, data.rotation()));
+        } catch (Exception e) {
             log.error("Could not scale image {} to height {}", imageUrl, height, e);
         }
         return null;
     }
 
-    private BufferedImage scaleImage(BufferedImage data, int height, int preferredWidth) {
+    private BufferedImage scaleImage(BufferedImage data, int height, int preferredWidth, int rotation) {
         BufferedImage bufferedImage = new BufferedImage(preferredWidth, height, data.getType());
         Graphics2D graphics = bufferedImage.createGraphics();
+        graphics.rotate(Math.toRadians(rotation), preferredWidth / 2f, height / 2f);
         graphics.drawImage(data, 0, 0, preferredWidth, height, null);
         graphics.dispose();
         return bufferedImage;
     }
 
 
-    public ImageData loadImage(String imageUrl) throws IOException {
+    public ImageData loadImage(String imageUrl) throws IOException, ImageProcessingException, MetadataException {
         final var imageStream = new URL(imageUrl).openStream();
+
+        Metadata metadata = ImageMetadataReader.readMetadata(imageStream);
+        ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+        int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+
+
+
         final var imageBytes = IOUtils.toByteArray(imageStream);
 
         final var format = MediaType.parse(tika.detect(imageBytes));
         final var image = ImageIO.read(new ByteArrayInputStream(imageBytes));
 
 
-        return new ImageData(format, image);
+        return new ImageData(format, image, orientation);
     }
 
 
