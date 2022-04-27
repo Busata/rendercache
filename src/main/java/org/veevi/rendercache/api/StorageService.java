@@ -43,7 +43,7 @@ public class StorageService {
         try {
             final var bufferedImage = ImageIO.read(inputFile);
             final var mediaFormat = MediaType.parse(new Tika().detect(inputFile));
-            return new ImageData(mediaFormat, bufferedImage);
+            return new ImageData(mediaFormat, bufferedImage, 0);
 
         } catch (IOException e) {
            throw new RuntimeException("Could not read the file");
