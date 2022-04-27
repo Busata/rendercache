@@ -65,7 +65,7 @@ public class ImageService {
     public ImageData loadImage(String imageUrl) throws IOException, ImageProcessingException, MetadataException {
         final var imageStream = new URL(imageUrl).openStream();
 
-        int orientation = getOrientation(imageStream);
+        int orientation = getOrientation(new URL(imageUrl).openStream());
 
         final var imageBytes = IOUtils.toByteArray(imageStream);
 
