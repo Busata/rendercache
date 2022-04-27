@@ -53,6 +53,7 @@ public class ImageService {
 
     private BufferedImage scaleImage(BufferedImage data, int height, int preferredWidth, int rotation) {
         BufferedImage bufferedImage = new BufferedImage(preferredWidth, height, data.getType());
+        log.info("Rotation: {}", rotation);
         Graphics2D graphics = bufferedImage.createGraphics();
         graphics.drawImage(data, 0, 0, preferredWidth, height, null);
         graphics.rotate(Math.toRadians(rotation), preferredWidth / 2f, height / 2f);
