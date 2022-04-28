@@ -64,17 +64,19 @@ public class ImageService {
         return rotate(bufferedImage, rotation);
     }
 
-    public static BufferedImage rotate(BufferedImage img, int angle) {
-        int w = img.getWidth();
-        int h = img.getHeight();
+    public static BufferedImage rotate(BufferedImage bimg, double angle) {
 
-        BufferedImage dimg = new BufferedImage(w, h, img.getType());
+        int w = bimg.getWidth();
+        int h = bimg.getHeight();
 
-        Graphics2D g = dimg.createGraphics();
-        g.drawImage(img, null, 0, 0); //Draw before rotating
-        g.rotate(Math.toRadians(angle), w/2, h/2); //Rotating after drawing
-        return dimg;
+        BufferedImage rotated = new BufferedImage(w, h, bimg.getType());
+        Graphics2D graphic = rotated.createGraphics();
+        graphic.rotate(Math.toRadians(angle), w/2, h/2);
+        graphic.drawImage(bimg, null, 0, 0);
+        graphic.dispose();
+        return rotated;
     }
+
 
     public ImageData loadImage(String imageUrl) throws IOException, ImageProcessingException, MetadataException {
         final var imageStream = new URL(imageUrl).openStream();
