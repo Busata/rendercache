@@ -68,7 +68,7 @@ public class ImageService {
 
     public static BufferedImage rotate(BufferedImage bimg, double angle) {
 
-        final double rads = Math.toRadians(90);
+        final double rads = Math.toRadians(angle);
         final double sin = Math.abs(Math.sin(rads));
         final double cos = Math.abs(Math.cos(rads));
         final int w = (int) Math.floor(bimg.getWidth() * cos + bimg.getHeight() * sin);
