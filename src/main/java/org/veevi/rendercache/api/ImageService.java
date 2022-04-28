@@ -52,13 +52,14 @@ public class ImageService {
     }
 
     private BufferedImage scaleImage(BufferedImage data, int height, int preferredWidth, int rotation) {
-        BufferedImage bufferedImage = new BufferedImage(preferredWidth, height, data.getType());
-        log.info("Rotation: {}", rotation);
-        Graphics2D graphics = bufferedImage.createGraphics();
-        graphics.rotate(Math.toRadians(rotation), preferredWidth / 2f, height / 2f);
 
         int actualWidth = rotation == 270 || rotation == 90 ? height : preferredWidth;
         int actualHeight = rotation == 270 || rotation == 90 ? preferredWidth : height;
+
+        BufferedImage bufferedImage = new BufferedImage(actualWidth, actualHeight, data.getType());
+        log.info("Rotation: {}", rotation);
+        Graphics2D graphics = bufferedImage.createGraphics();
+        graphics.rotate(Math.toRadians(rotation), preferredWidth / 2f, height / 2f);
 
 
         graphics.drawImage(data, 0, 0, actualWidth, actualHeight, null);
