@@ -56,7 +56,12 @@ public class ImageService {
         log.info("Rotation: {}", rotation);
         Graphics2D graphics = bufferedImage.createGraphics();
         graphics.rotate(Math.toRadians(rotation), preferredWidth / 2f, height / 2f);
-        graphics.drawImage(data, 0, 0,null);
+
+        int actualWidth = rotation == 270 || rotation == 90 ? height : preferredWidth;
+        int actualHeight = rotation == 270 || rotation == 90 ? preferredWidth : height;
+
+
+        graphics.drawImage(data, 0, 0, actualWidth, actualHeight, null);
         graphics.dispose();
         return bufferedImage;
     }
