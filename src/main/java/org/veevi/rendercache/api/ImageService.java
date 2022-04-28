@@ -53,18 +53,44 @@ public class ImageService {
 
     private BufferedImage scaleImage(BufferedImage data, int height, int preferredWidth, int rotation) {
 
-        int actualWidth = rotation == 270 || rotation == 90 ? height : preferredWidth;
-        int actualHeight = rotation == 270 || rotation == 90 ? preferredWidth : height;
 
-        BufferedImage bufferedImage = new BufferedImage(actualWidth, actualHeight, data.getType());
+        BufferedImage bufferedImage = new BufferedImage(preferredWidth, height, data.getType());
         log.info("Rotation: {}", rotation);
         Graphics2D graphics = bufferedImage.createGraphics();
-        graphics.rotate(Math.toRadians(rotation), preferredWidth / 2f, height / 2f);
 
 
-        graphics.drawImage(data, 0, 0, actualWidth, actualHeight, null);
+        graphics.drawImage(data, 0, 0, preferredWidth, height, null);
         graphics.dispose();
-        return bufferedImage;
+        return rotateImage(bufferedImage, rotation);
+    }
+
+    private static BufferedImage rotateImage(BufferedImage buffImage, double angle) {
+        double radian = Math.toRadians(angle);
+        double sin = Math.abs(Math.sin(radian));
+        double cos = Math.abs(Math.cos(radian));
+
+        int width = buffImage.getWidth();
+        int height = buffImage.getHeight();
+
+        int nWidth = (int) Math.floor((double) width * cos + (double) height * sin);
+        int nHeight = (int) Math.floor((double) height * cos + (double) width * sin);
+
+        BufferedImage rotatedImage = new BufferedImage(
+                nWidth, nHeight, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D graphics = rotatedImage.createGraphics();
+
+        graphics.setRenderingHint(
+                RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
+        graphics.translate((nWidth - width) / 2, (nHeight - height) / 2);
+        // rotation around the center point
+        graphics.rotate(radian, (double) (width / 2), (double) (height / 2));
+        graphics.drawImage(buffImage, 0, 0, null);
+        graphics.dispose();
+
+        return rotatedImage;
     }
 
 
