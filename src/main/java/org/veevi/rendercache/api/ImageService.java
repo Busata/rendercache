@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -66,15 +68,19 @@ public class ImageService {
 
     public static BufferedImage rotate(BufferedImage bimg, double angle) {
 
-        int w = bimg.getWidth();
-        int h = bimg.getHeight();
-
-        BufferedImage rotated = new BufferedImage(w, h, bimg.getType());
-        Graphics2D graphic = rotated.createGraphics();
-        graphic.rotate(Math.toRadians(angle), w/2, h/2);
-        graphic.drawImage(bimg, null, 0, 0);
-        graphic.dispose();
-        return rotated;
+        final double rads = Math.toRadians(90);
+        final double sin = Math.abs(Math.sin(rads));
+        final double cos = Math.abs(Math.cos(rads));
+        final int w = (int) Math.floor(bimg.getWidth() * cos + bimg.getHeight() * sin);
+        final int h = (int) Math.floor(bimg.getHeight() * cos + bimg.getWidth() * sin);
+        final BufferedImage rotatedImage = new BufferedImage(w, h, bimg.getType());
+        final AffineTransform at = new AffineTransform();
+        at.translate(w / 2, h / 2);
+        at.rotate(rads,0, 0);
+        at.translate(-bimg.getWidth() / 2, -bimg.getHeight() / 2);
+        final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        rotateOp.filter(bimg,rotatedImage);
+        return rotatedImage;
     }
 
 
